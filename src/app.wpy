@@ -1,0 +1,140 @@
+<style lang="less">
+  @import 'weui.wxss';
+  @import 'Iconfont/iconfont.wxss';
+  .clrCaramel{color:#dd6741}
+  .bg_primary{background: #2298be;color:white}
+  .bg_caramel{background: #dd6741;color:white}
+  .bg_white{background: white}
+  .page__hd {
+    padding: 40px;
+  }
+  .page__bd {
+    padding-bottom: 80px;
+  }
+  .page__ft {
+    position: fixed;
+    bottom:0px;
+    display: block;
+    height: 46px;
+    width: 100%;
+
+  }
+  .button-hover[type=primary] {
+    color:rgba(255, 255, 255, 0.6);
+    background-color:#2298be;
+
+  }
+  button[type=primary] {
+    color:#FFFFFF;
+    background-color:#2298be;
+
+  }
+
+
+.container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+}
+
+</style>
+
+<script>
+import wepy from 'wepy'
+import 'wepy-async-function'
+
+import { setStore } from 'wepy-redux'
+import configStore from './store'
+
+const store = configStore()
+setStore(store)
+
+export default class extends wepy.app {
+  config = {
+    "pages": [
+      "pages/index",
+      "pages/me",
+      "pages/wordsList",
+      "pages/wordsDetail",
+      "pages/exam",
+      "pages/examResult",
+      "pages/errorWordsList",
+    ],
+    "tabBar": {
+      "list": [{
+        "iconPath": "images/index.png",
+        "selectedIconPath": "images/index-hvr.png",
+        "selectedColor": "#dd6741",
+        "color": "#333333",
+        "pagePath": "pages/index",
+        "text": "背词"
+      }, {
+        "iconPath": "images/me.png",
+        "selectedIconPath": "images/me-hvr.png",
+        "selectedColor": "#dd6741",
+        "color": "#333333",
+        "pagePath": "pages/me",
+        "text": "我的"
+      }]
+    },
+    "window": {
+      "backgroundTextStyle": "dark",
+      "navigationBarBackgroundColor": "#dd6741",
+      "navigationBarTitleText": "背单词",
+      "navigationBarTextStyle": "white"
+    },
+    "networkTimeout": {
+      "request": 10000,
+      "downloadFile": 10000
+    },
+  }
+
+  globalData = {
+    userInfo: null,
+    devUrl:'https://yourwebsitename.com',
+    openId:'',
+    reLoadIndex:false,
+  }
+
+  constructor () {
+    super()
+    this.use('requestfix')
+  }
+
+  onLaunch() {
+    //this.testAsync()
+    
+  }
+
+  sleep (s) {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        resolve('promise resolved')
+      }, s * 1000)
+    })
+  }
+
+  async testAsync () {
+    // const data = await this.sleep(3)
+    // console.log(data)
+  }
+
+  getUserInfo(cb) {
+    const that = this
+    if (this.globalData.userInfo) {
+      return this.globalData.userInfo
+    }
+    wepy.getUserInfo({
+      success (res) {
+        that.globalData.userInfo = res.userInfo;
+        //cb && cb(that.globalData.userInfo)
+        cb && cb(res.userInfo)
+      }
+    })
+  }
+  
+}
+</script>

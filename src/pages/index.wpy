@@ -1,0 +1,237 @@
+<style lang="less">
+  .stripe{
+    background: linear-gradient(90deg,rgba(200,0,0,.2) 10%,transparent 0),
+    linear-gradient(rgba(200,0,0,.2) 10%,transparent 0);
+    background-size: 30px 30px;
+  }
+  .lessonBox{
+    width: 75px;
+    height: 75px;
+    border-radius: 5px;
+    border:1px solid #dfdfdf;
+    display: block;
+    text-align: center;
+    margin: 0 auto;
+  .lessonId{
+    height: 66%;
+    line-height: 50px;
+    display: block;
+    width: 100%;
+  }
+  .lessonStar{
+    height: 33%;
+    width: 100%;display: block;
+    border-top:1px solid #dfdfdf;
+  }
+  }
+</style>
+<template>
+  <view class="page">
+    <view class="page__hd">
+      选择关卡
+    </view>
+    <view class="page__bd">
+      <view class="weui-grids">
+        <block wx:for="{{list1}}" wx:key="item.lesson">
+          <view class="weui-grid" hover-class="weui-grid_active" @tap="toast({{item.islock}},{{item.lesson}})">
+            <div class="lessonBox">
+              <div class="lessonId">{{item.lesson}}</div>
+              <div class="lessonStar">
+                <span wx:if="{{item.islock}}">
+                  <i wx:key="item.lesson" wx:for="{{item.start}}" class="icon iconfont icon-xing clrCaramel"></i>
+                  <i wx:key="item.lesson"  wx:for="{{3-item.start}}" class="icon iconfont icon-favorite clrCaramel"></i>
+                </span>
+                <span wx:else><i class="icon iconfont icon-suo"></i></span>
+
+              </div>
+            </div>
+            <!--<view class="weui-grid__label">第{{item.lesson}}关</view>-->
+          </view>
+        </block>
+      </view>
+
+    </view>
+
+
+    <toast />
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+
+  import Panel from '@/components/panel' // alias example
+  import Toast from 'wepy-com-toast'
+
+
+
+
+
+  export default class Index extends wepy.page {
+    config = {
+      navigationBarTitleText: '布丁单词'
+    }
+    components = {
+      panel: Panel,
+      toast: Toast
+    }
+
+
+    data = {
+      mynum: 20,
+      currentRange:6,
+      userInfo: {
+        nickName: '加载中...',
+        avatarUrl:'',
+      },
+
+      openId:'',
+      count: 0,//星星总数
+      netrst: '',
+      list1: [],
+    }
+
+    computed = {
+      // showList () {
+      //   console.log(this.list1,"data.list1 showlist");
+      //   return this.list1;
+      // }
+    }
+    watch={
+      // userInfo
+    }
+    methods = {
+      plus () {
+        this.mynum++
+      },
+      toast (lock,lesson) {
+        console.log(lock,lesson,"lock,lesson");
+        if(this.count<15 && lock>this.currentRange){
+          let promise = this.$invoke('toast', 'show', {
+            title: '达到15星才能解锁下一关',
+          })
+          promise.then((d) => {
+            console.log('toast done')
+          })
+        }
+        else if(lock==0 && lock<this.currentRange){
+        let promise = this.$invoke('toast', 'show', {
+          title: '请先解除前面关卡',
+        })
+        promise.then((d) => {
+          console.log('toast done')
+        })
+        }
+
+        else{
+          wx.navigateTo({
+            url:'wordsList?id='+lesson
+          });
+        }
+
+
+      },
+      tap () {
+        console.log('do noting from ' + this.$name)
+      },
+      request(self){
+        wepy.request({
+          url:  self.$parent.globalData.devUrl+'/Users?openId='+res.code+'&nickName='+self.userInfo.nickName+'&iconUrl='+self.userInfo.avatarUrl+'&isHuiHui=1',
+          method:'POST',
+          success: function (d) {
+            console.log(d,"index onload");
+            if(d.data.result){
+              self.list1=d.data.result;
+              self.$parent.globalData.openId=d.data.openId;
+              //统计星星数目
+              for(var i in self.list1){self.count+=self.list1[i].start;}
+              //console.log(self.count,'self.count',self.$parent.globalData.openId,'self.$parent.globalDataopenId');
+            }
+            self.$apply()
+          }
+        })
+      }
+
+    }
+
+
+
+
+    onLoad(options) {
+      let self = this;
+      this.$parent.getUserInfo(function (userInfo) {
+        if (userInfo) {
+          self.userInfo = userInfo;
+          self.$apply();
+          wx.login({
+            success: function(res) {
+              if (res.code) {
+                wepy.request({
+                  url:  self.$parent.globalData.devUrl+'/Users?openId='+res.code+'&nickName='+self.userInfo.nickName+'&iconUrl='+self.userInfo.avatarUrl+'&isHuiHui=1',
+                  method:'POST',
+                  success: function (d) {
+                    if(d.data.result){
+                    self.list1=d.data.result;
+                    self.$parent.globalData.openId=d.data.openId;
+                    //统计星星数目
+                    for(var i in self.list1){self.count+=self.list1[i].start;}
+
+                    }
+                    self.$apply()
+                  }
+                })
+                //request end
+
+              } else {
+                console.log('登录失败！' + res.errMsg)
+              }
+            }
+          });
+          //login end
+        }
+
+      })
+
+
+    }
+
+    onShow(){
+      console.log('==========on hshowindex');
+
+      let self = this;
+      if(self.$parent.globalData.reLoadIndex){
+        console.log('==========reload',self.$parent.globalData.reLoadIndex,'self.$parent.globalData.reLoadIndex');
+        wx.login({
+          success: function(res) {
+            if (res.code) {
+              wepy.request({
+                url:  self.$parent.globalData.devUrl+'/Users?openId='+res.code+'&nickName='+self.userInfo.nickName+'&iconUrl='+self.userInfo.avatarUrl+'&isHuiHui=1',
+                method:'POST',
+                success: function (d) {
+                  console.log(d,"index show");
+                  if(d.data.result){
+                    self.list1=d.data.result;
+                    self.$parent.globalData.openId=d.data.openId;
+                    //统计星星数目
+                    for(var i in self.list1){self.count+=self.list1[i].start;}
+                    //console.log(self.count,'self.count',self.$parent.globalData.openId,'self.$parent.globalDataopenId');
+                  }
+                  self.$parent.globalData.reLoadIndex=false;
+                  self.$apply()
+                }
+              })
+              //request end
+
+            } else {
+              console.log('登录失败！' + res.errMsg)
+            }
+          }
+        });
+      }
+
+
+    }
+
+    //
+  }
+</script>

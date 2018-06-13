@@ -1,0 +1,321 @@
+<style lang="less">
+  .bg_light_gray{background:#d9d9d9;}
+  .exam_btn_list{
+    button{width: 92%;height: 91%;}
+  }
+  .question_dtl{
+    .page__title{}
+    .page__desc,.page__desc p{color:#eeeeee;font-size: 15px}
+    .mgt26{margin-top: 26px;}
+    .mgb26{margin-bottom: 26px;}
+
+  }
+  .displayMask{width: 100%;height: 100%;position: fixed;background: #999999; left: 0;top:0;z-index:9;opacity: 0.7}
+  .wordsDtls{z-index:10;width: 100%;position: fixed;bottom: 0}
+  .dis-blk{ display: block}
+  .flex-grow6{flex-grow:6}
+</style>
+<template>
+  <view class="page">
+    <progress percent="{{current/questionAll*100}}" stroke-width="3" activeColor="#2298be"/>
+    <view class="displayMask" style="display:{{displayMask}}" @tap="hideMask"></view>
+    <view class='wordsDtls  bg_white' style="display:{{displayMask}}">
+      <wordsDtl :list.sync="wordsDtls" :questionId.sync="examSingle.questionId"></wordsDtl>
+      <view class="page__ft exam_btn_list" style="display:{{displayFt}}">
+        <button class="weui-btn color" wx:if="{{(lastQuestionId!=examSingle.questionId) && (life!=0)}}"  type="default" @tap="continueExam()">下一题</button>
+        <button class="weui-btn color"  wx:else type="primary" @tap="submitExam()">完成</button>
+
+      </view>
+    </view>
+
+    <view class="page__hd bg_caramel question_dtl">
+      <view class="page__desc mgb26">第{{current}}题：</view>
+      <view class="page__title">{{examSingle.question}}</view>
+      <view class="page__desc mgt26"><button class="weui-btn mini-btn" type="default" size="mini" wx:if="{{displayHt}}" @tap="chgDisplayHt">需要中文提示？</button><p wx:else>{{examSingle.hint}}</p></view>
+
+    </view>
+    <view class="page__bd">
+      <view class="weui-cells__title">
+        <view class="weui-flex">
+          <view class="weui-flex__item flex-grow6"><view class="placeholder">点击选项进行选择</view></view>
+          <view class="weui-flex__item"><view class="placeholder"><i class="iconfont icon-xin clrCaramel"> {{life}}</i></view></view>
+        </view>
+      </view>
+      <view class="weui-cells weui-cells_after-title">
+        <view class="weui-cell {{errorSection[index]==1?'bg_caramel':errorSection[index]==2?'bg_primary':''}}" wx:for="{{examSingle.section}}" wx:key="index" id="section{{index}}">
+          <view class="weui-cell__bd" @tap="tap({{index}})">{{index}}.{{examSingle.section[index]}}</view>
+          <view class="weui-cell__ft"></view>
+        </view>
+      </view>
+    </view>
+    <view class="page__ft" style="display:{{displayFt}}">
+      <view class="weui-flex exam_btn_list">
+        <view class="weui-flex__item"><button class="weui-btn color" type="primary" @tap="showDtl()">解析</button></view>
+        <view class="weui-flex__item">
+          <button class="weui-btn color" wx:if="{{(lastQuestionId!=examSingle.questionId) && (life!=0)}}"  type="default" @tap="continueExam()">下一题</button>
+          <button class="weui-btn color"  wx:else @tap="submitExam()">完成</button>
+
+        </view>
+
+      </view>
+
+    </view>
+
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import { connect } from 'wepy-redux'
+  import Panel from '@/components/panel' // alias example
+  import Counter from 'counter' // alias example
+  import List from '../components/list' // aliasFields example
+  import WordsDtl from '../components/wordsDtl'
+
+
+
+  @connect({
+    // num (state) {
+    //   return state.counter.num
+    // },
+    // asyncNum (state) {
+    //   return state.counter.asyncNum
+    // },
+    // sumNum (state) {
+    //   return state.counter.num + state.counter.asyncNum
+    // }
+  })
+
+  export default class Index extends wepy.page {
+    config = {
+      navigationBarTitleText: '进度0/0'
+    }
+    components = {
+      panel: Panel,
+      list: List,
+      wordsDtl: WordsDtl,
+    }
+    data = {
+      lessonId:0,
+      life:5,
+      questionAll:20,
+      current:1,
+      errorSection:{A:0,B:0,C:0,D:0},
+      selected:false,
+      displayHt:true,//显示提示按钮/不显示提示内容
+      displayFt:'none',//显示足部
+      displayMask:'none',//遮罩层
+      wordsDtls:{},//单词详情信息
+      userInfo: {
+        nickName: '加载中...'
+      },
+      lessonId:1,
+      count: 0,
+      examStatus:[],
+      examAll:[],
+      lastQuestionId:222,
+      examSingle:{},
+
+      errorWordLists:[],//错词编号
+      errorWordDtlLists:[],//错词详情
+    }
+
+    computed = {
+      now () {
+        return +new Date()
+      }
+    }
+
+    methods = {
+      plus () {
+        this.mynum++
+      },
+      chgDisplayHt(){
+        this.displayHt=!this.displayHt;
+      },
+      tap (section) {
+        var self=this;
+        //如果已选则点击其他选项无效
+        if(this.selected==false)
+        {
+          //记录
+
+          var datas={
+            'questionId':self.examSingle.questionId,
+            'selected':section,
+            'judge':section==self.examSingle.correct?'1':'0',
+            'wordId':self.examSingle.wordId,
+
+          }
+          self.examStatus.push(datas);
+          //做错的情况：标红，出解析
+          if(section!=self.examSingle.correct){
+            self.errorSection[section]=1;
+            self.life-=1;
+            self.errorSection[self.examSingle.correct]=2;
+            self.displayFt='block';
+            self.selected=true;
+            self.methods.getDtls(self.examSingle.wordId,self);
+          }
+          else{
+            //做对的情况：标蓝，3秒后下一题
+
+            self.errorSection[self.examSingle.correct]=2;
+            setTimeout(function () {
+              if(self.lastQuestionId==self.examSingle.questionId)
+              {
+                console.log('最后一题 做对了');
+                self.methods.submitExam(self);
+
+              }
+              else{
+                self.methods.continueExam(self);
+              }
+            }, 500)
+          }
+
+        }
+      },
+      hideMask(){
+        this.displayMask='none';
+      },
+      showDtl() {
+        //解析
+        let self=this;
+        this.displayMask='block';
+        // console.log(self.examSingle.wordId,'self.examSingle.wordId');
+        // self.methods.getDtls(self.examSingle.wordId,self);
+
+
+      },
+      getDtls(wordId,self){
+        try {
+          var res = wx.getStorageSync('wordList')
+          if (res) {
+            for (var i in res)
+            {
+              if(res[i].wordId==wordId)
+              {
+                self.wordsDtls=res[i];
+                self.errorWordDtlLists.push(res[i]);
+                console.log(self.wordsDtls,'self.wordsDtls');
+              }
+            }
+          }
+        } catch (e) {
+          console.log("单词详情失败信息，改用调取id");
+          wepy.request({
+            url:  self.$parent.globalData.devUrl+'/lesson?wordId='+wordId,
+            method:'POST',
+            success: function (d) {
+
+              if(d.statusCode==200){
+                self.wordsDtls=JSON.parse(d.data.result);
+                self.errorWordDtlLists.push(res[i]);
+
+              }
+              else{
+                console.log(d,'单词获取失败信息');
+              }
+
+            }
+          })
+          //调用完毕
+        }
+
+      },
+      continueExam(self) {
+        if(!self)
+        {
+          var self = this;
+        }
+        //各种标记归位
+        for(var i in self.errorSection)
+        {
+          self.errorSection[i]=0;
+        }
+        self.displayFt='none';
+        self.displayMask='none';
+        self.displayHt=true;
+        self.selected=false;
+        self.current+=1;
+        self.examSingle=self.examAll[self.current-1];
+          wx.setNavigationBarTitle({
+          title:'进度'+self.current+ '/'+self.questionAll
+        })
+         self.$apply();//settimeout是异步需要加apply
+
+
+      },
+      submitExam(self){
+        //最后一题/生命为0时交卷
+        if(!self)
+        {
+          var self = this;
+        }
+        //以键值对的形式存储 传进去的是个对象
+        wx.setStorage({ key: 'errorWordDtlLists',data:self.errorWordDtlLists})
+        //根据错误id获取单词详情并存储
+        //准备上传结果
+        //上传结果
+        wx.request({
+          url: self.$parent.globalData.devUrl+'/questions',
+          data: {
+            'openId':self.$parent.globalData.openId,
+            'questionResult':JSON.stringify(self.examStatus),
+            'lessonId':self.lessonId
+          },
+          method:'POST',
+          dataType:'json',
+          header: {
+            'content-type': 'application/x-www-form-urlencoded',
+          },
+          success: function(res) {
+            console.log(res.data.result,"res");
+            wx.setStorage({ key: 'examResult',data:res.data.result});
+            wx.redirectTo({
+              url: 'examResult'
+            })
+          }
+        })
+
+
+      },
+
+
+    }
+
+
+    onLoad(options) {
+      let self = this;
+      self.lessonId=options.id;
+
+      //获取试题信息
+      wepy.request({
+        url: self.$parent.globalData.devUrl+'/questions?lesson='+self.lessonId,
+        method:'GET',
+        success: function (d) {
+          if(d.statusCode==200){
+            self.examAll=d.data.result;
+            var tmpLife=[];//获取生命（本次测试单词个数）
+            for(var i in self.examAll)
+            {
+               self.examAll[i].section=JSON.parse(self.examAll[i].section);
+               if(tmpLife.indexOf(self.examAll[i].wordId)<0)
+               {tmpLife.push(self.examAll[i].wordId)}
+            }
+            self.life=tmpLife.length;//获取生命（本次测试单词个数）
+            self.examSingle=self.examAll[0];
+            self.lastQuestionId=self.examAll[Object.keys(self.examAll).length-1].questionId;
+             self.questionAll=Object.keys(self.examAll).length;
+          }
+          self.$apply();
+        }
+      })
+      wx.setNavigationBarTitle({
+        title:'进度'+self.current+ '/'+self.questionAll
+      })
+    }
+
+  }
+</script>

@@ -1,0 +1,62 @@
+<style type="less">
+  .word_dtl{
+    .page__title{font-size: 26px}
+    .page__desc,.page__desc p{font-size: 15px}
+    .mgt26{margin-top: 26px;}
+  }
+  .wrong_info{font-size: 12px;background: #efefef;color:#333333;padding: ~"10rpx";border-radius:~"10rpx";border:1px solid #dfdfdf;margin-left:~"20rpx";  }
+
+</style>
+<template>
+  <view class="page__hd  bg_caramel word_dtl">
+    <view class="page__title">{{list.word}}</view>
+    <view class="page__desc"><p>[{{list.hiragana}}]{{list.tone}}</p></view>
+    <view class="page__desc mgt26">【{{list.speech}}】{{list.chinese}}</view>
+  </view>
+  <view class="page__bd">
+    <panel>
+      <view class="title" slot="title">{{list.phrase}}</view>
+      <text class="info">{{list.phrase_note}}</text>
+    </panel>
+    <text class="wrong_info" wx:if="{{list.errorCount>0}}">这个词我做错过{{list.errorCount}}次</text>
+  </view>
+
+</template>
+<script>
+  import wepy from 'wepy'
+  import Panel from '@/components/panel' // alias example
+  export default class WordsDtl extends wepy.component {
+    props = {
+      list: {
+        type:Object,
+        default:{},
+        twoWay: true
+      },
+      questionId: {
+        type:String,
+        default:'0',
+        twoWay: true
+      },
+      wordId:{
+        type:String,
+        default:'0',
+        twoWay: true
+      },
+
+    }
+    components = {
+      panel:Panel
+    }
+
+
+    methods = {
+      // tap () {
+      //   this.grouplist.name = `Parent Random(${Math.random()})`
+      //   console.log(`Clicked Group ${this.$index}, ID is ${this.grouplist.id}`)
+      // }
+    }
+    onLoad(){
+      //console.log(this.props.list,'list in dtl.wpy')
+    }
+  }
+</script>

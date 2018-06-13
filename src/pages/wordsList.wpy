@@ -1,0 +1,148 @@
+<style lang="less">
+  .bdrRed{ border-left: 2px #dd6741 solid;border-bottom: 1px #dd6741 solid;border-top: 1px #dd6741 solid}
+</style>
+<template>
+  <view class="page">
+    <view class="page__bd">
+      <view class="weui-cells weui-cells_after-title">
+
+        <view class="weui-cells weui-cells_after-title">
+          <view  wx:for="{{list}}" wx:key="item.wordId" class="weui-cell weui-cell_access {{item.errorCount>0?'bdrRed':''}}" hover-class="weui-cell_active" @tap="toDtl({{item.wordId}})">
+            <view class="weui-cell__bd">{{item.word}}</view>
+            <view class="weui-cell__ft weui-cell__ft_in-access">{{item.chinese}}</view>
+          </view>
+        </view>
+      </view>
+
+    </view>
+    <view class="page__ft">
+      <button class="weui-btn color" type="primary" @tap="startExam()">开始背词</button>
+    </view>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import { connect } from 'wepy-redux'
+  // import Panel from '@/components/panel' // alias example
+  import Counter from 'counter' // alias example
+  import List from '../components/list' // aliasFields example
+  import Group from '../components/group'
+  import Toast from 'wepy-com-toast'
+
+
+  @connect({
+    // num (state) {
+    //   return state.counter.num
+    // },
+    // asyncNum (state) {
+    //   return state.counter.asyncNum
+    // },
+    // sumNum (state) {
+    //   return state.counter.num + state.counter.asyncNum
+    // }
+  })
+
+  export default class Me extends wepy.page {
+    config = {
+      navigationBarTitleText: '第0关'
+    }
+    components = {
+      list: List,
+      group: Group,
+      toast: Toast
+    }
+    data = {
+      lessonId:3,
+      list:[],
+      first:null,
+      last:null,
+      selected:[],
+      idLists:[],
+
+    }
+    globalData = {
+      userInfo: null
+    };
+
+    computed = {
+    }
+
+    methods = {
+      toDtl(wordId){
+        var self=this;
+        wx.navigateTo({
+          url:'wordsDetail?id='+wordId
+        });
+      },
+      startExam(){
+        var self=this;
+        wx.navigateTo({
+          url:'exam?id='+self.lessonId,
+        });
+        // wx.showModal({
+        //   title: '提示',
+        //   content: '答题过程中退出，将无法保存进度从头开始，确定要开始么？',
+        //   success: function(res) {
+        //     if (res.confirm) {
+        //       console.log(self.selected,'this.selected');
+        //       wx.navigateTo({
+        //         url:'exam?id='+self.lessonId,
+        //       });
+        //     } else if (res.cancel) {
+        //       //console.log('用户点击取消')
+        //     }
+        //   }
+        // })
+
+      },
+
+    }
+
+    events = {
+      'index-emit': (...args) => {
+        let $event = args[args.length - 1]
+        console.log(`${this.$name} receive ${$event.name} from ${$event.source.$name}`)
+      }
+    }
+    onLoad(options) {
+      let self = this;
+
+      //改变标题读取关卡数
+      self.lessonId=options.id;
+      wx.setNavigationBarTitle({
+        title: '第'+self.lessonId+'关'
+      })
+      //获取内容
+
+      wepy.request({
+        url: self.$parent.globalData.devUrl+'/lesson?lesson='+self.lessonId+'&openId='+self.$parent.globalData.openId,
+        method:'POST',
+        success: function (d) {
+          console.log(d,"res in list");
+          if(d.statusCode==200){
+            self.list=d.data.result;
+            for(var i in self.list){
+              self.idLists.push(self.list[i].wordId);
+            }
+            self.first=self.list[0].wordId;
+            self.last=self.list[Object.keys(self.list).length-1].wordId;
+          }
+          self.$apply();
+          //本地存储当前关卡内容（异步）
+          //以键值对的形式存储 传进去的是个对象
+          wx.setStorage({ key: 'wordList',data:self.list})
+          wx.setStorage({key: 'wordFirstId',data:self.first})
+          wx.setStorage({ key: 'wordLastId',data:self.last})
+          wx.setStorage({ key: 'wordIdLists',data:self.idLists})
+
+
+        }
+      })
+
+
+    }
+
+
+  }
+</script>

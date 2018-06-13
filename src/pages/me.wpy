@@ -1,0 +1,117 @@
+<style lang="less">
+  .userinfo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .userinfo-avatar {
+    width: 80rpx;
+    height: 80rpx;
+    border-radius: 50%;
+  }
+
+</style>
+<template>
+  <view class="page">
+    <view class="userinfo page__hd bg_caramel">
+      <image class="userinfo-avatar" src="{{ userInfo.avatarUrl }}" background-size="cover"/>
+      <view class="userinfo-nickname">{{ userInfo.nickName }}</view>
+    </view>
+
+    <view class="page__bd">
+      <view class="weui-cells weui-cells_after-title">
+        <view class="weui-cell">
+          <view class="weui-cell__bd">背诵总数</view>
+          <view class="weui-cell__ft">{{count}}词</view>
+        </view>
+        <view class="weui-cells weui-cells_after-title">
+          <view class="weui-cell weui-cell_access" hover-class="weui-cell_active" @tap="errorWordsList">
+            <view class="weui-cell__bd">错词本</view>
+            <view class="weui-cell__ft weui-cell__ft_in-access">{{errorNum}}词</view>
+          </view>
+        </view>
+      </view>
+
+    </view>
+
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+
+  import Panel from '@/components/panel' // alias example
+
+  import List from '../components/list' // aliasFields example
+
+
+  export default class Me extends wepy.page {
+    config = {
+      navigationBarTitleText: '我的'
+    }
+    components = {
+      panel: Panel,
+      list: List,
+
+    }
+
+
+
+    data = {
+      errorNum: 0,
+      userInfo: {
+        nickName: '加载中...'
+      },
+      count: 100,
+
+    }
+
+    methods = {
+      errorWordsList() {
+        console.log('errorwordslist');
+        wx.navigateTo({
+          url:'errorWordsList',
+        });
+
+      }
+    }
+
+    onLoad() {
+      console.log('page me');
+      let self = this;
+      self.userInfo = this.$parent.globalData.userInfo;
+      self.$apply();
+    }
+    onShow(){
+      let self = this;
+      wepy.request({
+        url:  self.$parent.globalData.devUrl+'/words',
+        method:'POST',
+        data:{
+          'openId':self.$parent.globalData.openId,
+        },
+        dataType:'json',
+        header: {
+          'content-type': 'application/x-www-form-urlencoded',
+        },
+        success: function (d) {
+          console.log(d,"me show");
+          if(d.data.result){
+            self.errorNum=d.data.result.length;
+            if(self.errorNum>0)
+            {
+              wx.setStorage({ key: 'errorWordDtlLists',data:d.data.result})
+              // wx.setStorage({key: 'wordFirstId',data:d.data.result[0].wordId})
+              // wx.setStorage({ key: 'wordLastId',data:d.data.result[Object.keys(d.data.result).length-1].wordId})
+            }
+
+
+
+          }
+          self.$apply()
+        }
+      })
+    }
+  }
+</script>

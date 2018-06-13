@@ -1,0 +1,208 @@
+<style lang="less">
+  .bg_light_gray{background:#d9d9d9;}
+  .exam_btn_list{
+    border-top:1px solid #dfdfdf;;
+    background:white;padding-top: 2px;
+    button{width: 90%;height: 91%;}
+  }
+  .question_dtl{
+    .page__title{}
+    .page__desc,.page__desc p{color:#eeeeee;font-size: 15px}
+    .mgt26{margin-top: 26px;}
+    .mgb26{margin-bottom: 26px;}
+
+  }
+  .displayMask{width: 100%;height: 100%;position: fixed;background: #999999; left: 0;top:0;z-index:9;opacity: 0.7}
+  .wordsDtls{z-index:10;width: 100%;position: fixed;bottom: 0}
+  .mgCtr{
+    margin: auto;text-align: center;border-right: 1px solid #dfdfdf;
+    i{line-height: 45px;color:#333333}
+  }
+  .color_light_gray{color:#d9d9d9 !important;}
+</style>
+<template>
+  <view class="page">
+    <view class="displayMask" style="display:{{displayMask}}" @tap="hideMask"></view>
+    <view class='wordsDtls  bg_white' style="display:{{displayMask}}">
+      <wordsDtl :list.sync="wordsDtls" :wordId.sync="wordId"></wordsDtl>
+      <view class="page__ft" style="display:{{displayFt}}">
+        <view class="weui-flex exam_btn_list">
+          <view class="weui-flex__item mgCtr" @tap="prev({{wordId}})"><i class="icon iconfont icon-shang {{wordId==first?'color_light_gray':''}}"  ></i></view>
+          <view class="weui-flex__item mgCtr" @tap="next({{wordId}})"><i class="icon iconfont icon-xia {{wordId==last?'color_light_gray':''}}"></i></view>
+        </view>
+      </view>
+    </view>
+
+    <view class="page__hd bg_caramel question_dtl">
+      <view class="page__title">
+        <i wx:key="index" wx:for="{{star}}" class="icon iconfont icon-xing"></i>
+        <i wx:key="index"  wx:for="{{3-star}}" class="icon iconfont icon-favorite"></i>
+      </view>
+      <view class="page__desc mgt26">闯关<span wx:if="{{star==0}}">失败</span><span wx:else>成功</span></view>
+
+    </view>
+    <view class="page__bd">
+      <view class="weui-cells__title">
+        <view wx:if="{{count>0}}">错词列表，一共错了{{count}}个单词</view>
+        <view wx:else>非常好，全部答对</view>
+      </view>
+      <view class="weui-cells weui-cells_after-title">
+
+        <view class="weui-cells weui-cells_after-title">
+          <view  wx:for="{{errorWordDtlLists}}" wx:key="item.wordId" class="weui-cell weui-cell_access {{item.errorCount>0?'bdrRed':''}}" hover-class="weui-cell_active" @tap="showDtl({{item.wordId}})">
+            <view class="weui-cell__bd">{{item.word}}</view>
+            <view class="weui-cell__ft weui-cell__ft_in-access">{{item.chinese}}</view>
+          </view>
+        </view>
+      </view>
+
+    </view>
+    <view class="page__ft">
+      <view class="weui-flex exam_btn_list">
+        <view class="weui-flex__item"><button class="weui-btn color" type="primary" @tap="again()">再来一遍</button></view>
+        <view class="weui-flex__item"><button class="weui-btn color" type="default" @tap="mainMenu()">回到首页</button></view>
+      </view>
+
+    </view>
+
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import Panel from '@/components/panel' // alias example
+  import List from '../components/list' // aliasFields example
+  import WordsDtl from '../components/wordsDtl'
+
+  export default class Index extends wepy.page {
+    config = {
+      navigationBarTitleText: '测试结果'
+    }
+    components = {
+      panel: Panel,
+      list: List,
+      wordsDtl: WordsDtl,
+    }
+    data = {
+      star:0,
+      lessonId:0,
+      displayFt:'none',//显示足部
+      displayMask:'none',//遮罩层
+      wordsDtls:{},//单词详情信息
+      userInfo: {
+        nickName: '加载中...'
+      },
+      wordId:0,
+      lessonId:1,
+      errorWordDtlLists:[],
+      first:0,
+      last:0,
+      count:0,
+
+
+    }
+
+    computed = {
+      now () {
+        return +new Date()
+      }
+    }
+    methods = {
+
+      hideMask(){
+        this.displayMask='none';
+        this.displayFt='none';
+      },
+      prev(wordId){
+        let self = this;
+        if(self.wordId!=self.first)
+        {
+          self.wordId-=1;
+          self.methods.getDtls(parseInt(self.wordId),self);
+        }
+      },
+      next(wordId){
+        let self = this;
+        if(self.wordId!=self.last) {
+          self.wordId=parseInt(self.wordId)+1;
+          self.methods.getDtls(parseInt(self.wordId),self);
+        }
+
+      },
+      showDtl(wordId) {
+        //解析
+        let self=this;
+        self.displayMask='block';
+        self.displayFt='block';
+        self.wordId=wordId;
+        self.methods.getDtls(parseInt(wordId),self);
+
+
+      },
+      getDtls(wordId,self){
+        try {
+          var res = wx.getStorageSync('wordList')
+          if (res) {
+            for (var i in res)
+            {
+              if(res[i].wordId==wordId)
+              {
+                self.wordsDtls=res[i];
+              }
+            }
+          }
+        } catch (e) {
+          //
+        }
+
+      },
+      again(){
+        var self=this;
+        wx.navigateBack({
+          delta: 1
+        })
+      },
+      mainMenu(){
+        this.$parent.globalData.reLoadIndex=true;
+        this.$apply();
+        wx.switchTab({
+          url: 'index'
+        })
+      }
+
+    }
+
+
+    onLoad(options) {
+      let self = this;
+      //self.lessonId=options.id;
+      //获取错词列表
+      try {
+        var res = wx.getStorageSync('errorWordDtlLists')
+        if (res) {
+          self.errorWordDtlLists=res;
+          self.count=res.length;
+          if(self.count!=0)
+          {
+            self.first=self.errorWordDtlLists[0].wordId;
+            self.last=self.errorWordDtlLists[Object.keys(self.errorWordDtlLists).length-1].wordId;
+          }
+
+        }
+      } catch (e) {
+        //
+      }
+
+      //获取星级信息
+      try {
+        var res = wx.getStorageSync('examResult')
+        if (res) {
+          self.star=res.start;
+        }
+      } catch (e) {
+        //
+      }
+    }
+
+  }
+</script>
