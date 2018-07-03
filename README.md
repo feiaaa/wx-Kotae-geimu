@@ -5,8 +5,10 @@
 >当前二维码为体验版（只有12个单词和1关的题目，等把题库词库上完发正式版）
 >
 >![小程序](https://github.com/feiaaa/wx-Kotae-geimu/blob/master/src/images/ecode.png)
+>如果码扫出来无效的话，在文件夹里有MP4文件，可以查看演示情况
 
 ### 效果
+
 ![效果图](https://github.com/feiaaa/wx-Kotae-geimu/blob/master/src/images/pic.png)
 
 ### 使用工具
