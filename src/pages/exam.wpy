@@ -300,7 +300,7 @@
             var tmpLife=[];//获取生命（本次测试单词个数）
             for(var i in self.examAll)
             {
-               self.examAll[i].section=JSON.parse(self.examAll[i].section);
+              self.examAll[i].section=JSON.parse(self.examAll[i].section);
                if(tmpLife.indexOf(self.examAll[i].wordId)<0)
                {tmpLife.push(self.examAll[i].wordId)}
             }

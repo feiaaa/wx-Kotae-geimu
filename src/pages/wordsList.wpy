@@ -9,7 +9,7 @@
         <view class="weui-cells weui-cells_after-title">
           <view  wx:for="{{list}}" wx:key="item.wordId" class="weui-cell weui-cell_access {{item.errorCount>0?'bdrRed':''}}" hover-class="weui-cell_active" @tap="toDtl({{item.wordId}})">
             <view class="weui-cell__bd">{{item.word}}</view>
-            <view class="weui-cell__ft weui-cell__ft_in-access">{{item.chinese}}</view>
+            <view class="weui-cell__ft weui-cell__ft_in-access maxW50">{{item.chinese}}</view>
           </view>
         </view>
       </view>
@@ -23,25 +23,10 @@
 
 <script>
   import wepy from 'wepy'
-  import { connect } from 'wepy-redux'
-  // import Panel from '@/components/panel' // alias example
-  import Counter from 'counter' // alias example
   import List from '../components/list' // aliasFields example
   import Group from '../components/group'
   import Toast from 'wepy-com-toast'
 
-
-  @connect({
-    // num (state) {
-    //   return state.counter.num
-    // },
-    // asyncNum (state) {
-    //   return state.counter.asyncNum
-    // },
-    // sumNum (state) {
-    //   return state.counter.num + state.counter.asyncNum
-    // }
-  })
 
   export default class Me extends wepy.page {
     config = {

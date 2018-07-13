@@ -1,6 +1,7 @@
 <style lang="less">
   @import 'weui.wxss';
   @import 'Iconfont/iconfont.wxss';
+  .maxW50{max-width: 50%;min-width: 30%;}
   .clrCaramel{color:#dd6741}
   .bg_primary{background: #2298be;color:white}
   .bg_caramel{background: #dd6741;color:white}
@@ -94,7 +95,7 @@ export default class extends wepy.app {
 
   globalData = {
     userInfo: null,
-    devUrl:'https://yourwebsitename.com',
+    devUrl:'https://nfhh.site/cat',
     openId:'',
     reLoadIndex:false,
   }
@@ -106,7 +107,8 @@ export default class extends wepy.app {
 
   onLaunch() {
     //this.testAsync()
-    
+    var that=this;
+    // 上传前把login改到这里来
   }
 
   sleep (s) {
@@ -135,6 +137,6 @@ export default class extends wepy.app {
       }
     })
   }
-  
+  //公用方法查询单词详情
 }
 </script>
