@@ -95,7 +95,7 @@ export default class extends wepy.app {
 
   globalData = {
     userInfo: null,
-    devUrl:'https://nfhh.site/cat',
+    devUrl:'https://yourwebsite.site/apiname',
     openId:'',
     reLoadIndex:false,
   }
