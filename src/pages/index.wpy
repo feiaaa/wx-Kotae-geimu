@@ -171,11 +171,11 @@
                   method:'POST',
                   success: function (d) {
                     if(d.data.result){
-                    self.list1=d.data.result;
+                    self.list1=d.data.result.splice(0,12);
                     self.$parent.globalData.openId=d.data.openId;
                     //统计星星数目
                     for(var i in self.list1){self.count+=self.list1[i].start;}
-
+                      self.$parent.globalData.sum=self.count;
                     }
                     self.$apply()
                   }
@@ -210,7 +210,7 @@
                 success: function (d) {
                   console.log(d,"index show");
                   if(d.data.result){
-                    self.list1=d.data.result;
+                    self.list1=d.data.result.splice(0,12);
                     self.$parent.globalData.openId=d.data.openId;
                     //统计星星数目
                     for(var i in self.list1){self.count+=self.list1[i].start;}
