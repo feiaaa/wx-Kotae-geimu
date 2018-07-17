@@ -62,7 +62,7 @@
         let self = this;
         if(self.list.wordId!=self.first)
         {
-          self.wordId= self.idLists[self.idLists.indexOf(self.wordId)-1];
+           self.wordId= self.idLists[self.idLists.indexOf(parseInt(self.wordId))-1];
           self.methods.getDtls(self.wordId,self);
 
         }
@@ -70,7 +70,7 @@
       next(){
         let self = this;
         if(self.list.wordId!=self.last) {
-          self.wordId= self.idLists[self.idLists.indexOf(self.wordId)+1];
+          self.wordId= self.idLists[self.idLists.indexOf(parseInt(self.wordId))+1];
           self.methods.getDtls(self.wordId,self);
         }
 
@@ -96,20 +96,19 @@
     }
     onLoad(options) {
       let self = this;
-      console.log(options,'options');
+      console.log(options,'options',typeof(options.id),'options.id type');
       self.wordId=options.id;
       //获取
       wx.getStorage({
         //获取数据的key
         key: 'wordList',
         success: function(res) {
+          console.log(res.data,'res.data');
           var tmp=res.data;
           for (var i in tmp)
           {
-            if(tmp[i].wordId==self.wordId)
+            if(parseInt(tmp[i].wordId)==self.wordId)
             {self.list=tmp[i];
-
-            //self.$apply();
             }
           }
 
@@ -132,6 +131,7 @@
             }
           })
           //调用完毕
+          console.log(self.list,' self.list');
         }
       })
       wx.getStorage({
@@ -154,6 +154,7 @@
       })
 
     }
+
 
   }
 </script>

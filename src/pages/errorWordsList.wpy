@@ -73,7 +73,7 @@
           if(res.length!=0)
           {
             for(var i in res){
-              self.idLists.push(res[i].wordId);
+              self.idLists.push(parseInt(res[i].wordId));
             }
             self.first=self.errorWordDtlLists[0].wordId;
             self.last=self.errorWordDtlLists[Object.keys(self.errorWordDtlLists).length-1].wordId;

@@ -115,7 +115,6 @@
           'content-type': 'application/x-www-form-urlencoded',
         },
         success: function (d) {
-          console.log(d,"me show");
           if(d.data.result){
             self.errorNum=d.data.result.length;
             if(self.errorNum>0)
