@@ -119,7 +119,7 @@
             self.errorNum=d.data.result.length;
             if(self.errorNum>0)
             {
-              wx.setStorage({ key: 'errorWordDtlLists',data:d.data.result})
+              wx.setStorage({ key: 'wordList',data:d.data.result})
               // wx.setStorage({key: 'wordFirstId',data:d.data.result[0].wordId})
               // wx.setStorage({ key: 'wordLastId',data:d.data.result[Object.keys(d.data.result).length-1].wordId})
             }

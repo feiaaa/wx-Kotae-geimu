@@ -96,18 +96,16 @@
     }
     onLoad(options) {
       let self = this;
-      console.log(options,'options',typeof(options.id),'options.id type');
       self.wordId=options.id;
       //获取
       wx.getStorage({
         //获取数据的key
         key: 'wordList',
         success: function(res) {
-          console.log(res.data,'res.data');
           var tmp=res.data;
           for (var i in tmp)
           {
-            if(parseInt(tmp[i].wordId)==self.wordId)
+            if(tmp[i].wordId==parseInt(self.wordId))
             {self.list=tmp[i];
             }
           }

@@ -66,7 +66,7 @@
       let self = this;
 //获取错词列表
       try {
-        var res = wx.getStorageSync('errorWordDtlLists')
+        var res = wx.getStorageSync('wordList')
         if (res) {
           self.errorWordDtlLists=res;
           // self.count=res.length;
