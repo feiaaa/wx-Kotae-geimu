@@ -160,6 +160,7 @@
     onLoad(options) {
       let self = this;
       this.$parent.getUserInfo(function (userInfo) {
+        console.log('in userinfo index',userInfo);
         if (userInfo) {
           self.userInfo = userInfo;
           self.$apply();
