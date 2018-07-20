@@ -21,7 +21,7 @@
 
     <view class="page__bd">
       <view>
-        <button wx:if="{{canIUse}}" open-type="getUserInfo" @tap="bindGetUserInfo">授权登录</button>
+        <button wx:if="{{canIUse}}" open-type="getUserInfo" bindgetuserinfo="bindGetUserInfo">授权登录</button>
         <view wx:else>请升级微信版本</view>
       </view>
 
@@ -50,7 +50,20 @@
 
     methods = {
       bindGetUserInfo: function(e) {
+        var self=this;
         console.log(e,'=弹出授权登录窗口');
+        if (e.detail.userInfo){
+          //用户按了允许授权按钮
+          self.$parent.globalData.authUser=true;
+          self.$parent.globalData.userInfo=e.detail.userInfo;
+          self.$apply();
+          wx.switchTab({
+            url: 'index'
+          })
+        } else {
+          //用户按了拒绝按钮
+          self.$parent.globalData.authUser=false;
+        }
       },
 
 
@@ -58,10 +71,12 @@
 
     onLoad() {
       var self=this;
+      console.log('in onload');
 // 查看是否授权
       wx.getSetting({
         success: function(res){
           if (res.authSetting['scope.userInfo']) {
+            self.$parent.globalData.authUser=true;
             // 已经授权，可以直接调用 getUserInfo 获取头像昵称
             wx.getUserInfo({
               success: function(res) {
@@ -73,15 +88,18 @@
               }
             })
           }
+          else{
+            self.$parent.globalData.authUser=false;
+          }//else end
         }
       })
-      setTimeout(function () {
-        if(self.$parent.globalData.userInfo){
-          wx.switchTab({
-            url: 'index'
-          })
-        }
-      }, 1000)
+      // setTimeout(function () {
+      //   if(self.$parent.globalData.userInfo){
+      //     wx.switchTab({
+      //       url: 'index'
+      //     })
+      //   }
+      // }, 1000)
 
     }
 

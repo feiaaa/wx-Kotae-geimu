@@ -69,7 +69,8 @@
 
   export default class Index extends wepy.page {
     config = {
-      navigationBarTitleText: '布丁单词'
+      navigationBarTitleText: '布丁单词',
+      enablePullDownRefresh:true,
     }
     components = {
       panel: Panel,
@@ -101,6 +102,7 @@
       // userInfo
     }
     methods = {
+
       plus () {
         this.mynum++
       },
@@ -135,32 +137,44 @@
         console.log('do noting from ' + this.$name)
       },
       request(self){
-        wepy.request({
-          url:  self.$parent.globalData.devUrl+'/Users?openId='+res.code+'&nickName='+self.userInfo.nickName+'&iconUrl='+self.userInfo.avatarUrl+'&isHuiHui=1',
-          method:'POST',
-          success: function (d) {
-            console.log(d,"index onload");
-            if(d.data.result){
-              self.list1=d.data.result;
-              self.$parent.globalData.openId=d.data.openId;
-              //统计星星数目
-              for(var i in self.list1){self.count+=self.list1[i].start;}
-              //console.log(self.count,'self.count',self.$parent.globalData.openId,'self.$parent.globalDataopenId');
+        wx.login({
+          success: function(res) {
+            if (res.code) {
+              wepy.request({
+                url:  self.$parent.globalData.devUrl+'/Users?openId='+res.code+'&nickName='+self.userInfo.nickName+'&iconUrl='+self.userInfo.avatarUrl+'&isHuiHui=1',
+                method:'POST',
+                success: function (d) {
+                  if(d.data.result){
+                    self.list1=d.data.result.splice(0,12);
+                    self.$parent.globalData.openId=d.data.openId;
+                    //统计星星数目
+                    for(var i in self.list1){self.count+=self.list1[i].start;}
+                    self.$parent.globalData.sum=self.count;
+                  }
+                  self.$apply()
+                }
+              })
+              //request end
+
+            } else {
+              console.log('登录失败！' + res.errMsg)
             }
-            self.$apply()
           }
-        })
+        });
+        //login end
       }
 
     }
 
 
 
-
+    onPullDownRefresh() {
+      this.methods.request(this);//初始化页面的接口请求
+      wx.stopPullDownRefresh();//关闭下拉刷新
+    }
     onLoad(options) {
       let self = this;
       this.$parent.getUserInfo(function (userInfo) {
-        console.log('in userinfo index',userInfo);
         if (userInfo) {
           self.userInfo = userInfo;
           self.$apply();
@@ -197,7 +211,7 @@
     }
 
     onShow(){
-      console.log('==========on hshowindex');
+      console.log('==========on showindex');
 
       let self = this;
       if(self.$parent.globalData.reLoadIndex){
