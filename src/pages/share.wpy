@@ -1,0 +1,119 @@
+<style lang="less">
+  .userinfo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .userinfo-avatar {
+    width: 80rpx;
+    height: 80rpx;
+    border-radius: 50%;
+  }
+  .ecodeCtr{
+    width:100%;margin: auto;text-align: center;
+    img{
+      width: 40%;height: 60%}
+  }
+  .white__ft {
+    display: block;
+    height: calc(~'100% - 400px - 80px');;
+    width: 100%;
+  }
+  .bdrGreen{ border:1px solid darkgreen;border-collapse: collapse}
+</style>
+<template>
+  <view class="page">
+    <view class="userinfo bg_caramel page__hd">
+      <image class="userinfo-avatar" src="{{ userInfo.avatarUrl }}" background-size="cover"/>
+      <view class="font-L">“到今天为止，我总共获得了{{count}}个星星。”</view>
+    </view>
+
+    <view class="page__bd ecodeCtr" >
+      <image src="data:image/png;base64,{{imgUrl}}"/>
+    </view>
+    <view class="page__ft">
+      <button class="weui-btn color" type="primary" @tap="toLogin()">我也要加入</button>
+    </view>
+
+
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+
+  import Panel from '@/components/panel' // alias example
+
+  import List from '../components/list' // aliasFields example
+
+
+  export default class Share extends wepy.page {
+    config = {
+      navigationBarTitleText: '分享页'
+    }
+    components = {
+      panel: Panel,
+      list: List,
+
+    }
+    data = {
+      userInfo: {
+        nickName: '加载中...'
+      },
+      count: 100,
+      imgUrl:'',
+
+    }
+
+    methods = {
+      toLogin() {
+        wx.navigateTo({
+          url: 'login'
+        });
+      }
+    }
+
+    onLoad(options) {
+      let self = this;
+      self.userInfo = this.$parent.globalData.userInfo;
+      self.count =this.$parent.globalData.sum;//options.count
+      //获取二维码
+      wx.request({
+        // 获取token
+        url: 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential',
+        method: 'GET',
+        data: {
+          appid: 'yourappid',
+          secret: 'yoursecret'
+        },
+        success(res) {
+          // console.log(res,'res accseetoken');
+          wx.request({
+            // 调用接口C(普通型)
+            url: 'https://api.weixin.qq.com/cgi-bin/wxaapp/createwxaqrcode?access_token=' + res.data.access_token,
+            method: 'POST',
+            responseType:'arraybuffer',
+            data: {
+              "path": '/pages/login',
+              "width": 430,
+              "auto_color": false,
+              "line_color": { "r": "0", "g": "0", "b": "0" }
+            },
+            success(res) {
+              self.imgUrl=wx.arrayBufferToBase64(res.data);
+              self.$apply();
+            }
+          })
+        }
+      })
+      //二维码获取结束
+
+      self.$apply();
+    }
+    onShow(){
+      let self = this;
+
+    }
+  }
+</script>

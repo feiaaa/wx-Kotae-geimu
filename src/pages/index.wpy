@@ -137,7 +137,7 @@
         console.log('do noting from ' + this.$name)
       },
       request(self){
-        console.log(self.$parent.globalData.openId,'存在globaldata里的openid')
+        //console.log(self.$parent.globalData.openId,'存在globaldata里的openid')
         wepy.request({
           url:  self.$parent.globalData.devUrl+'/Users?openId='+self.$parent.globalData.openId+'&isHuiHui=1',
           method:'GET',
@@ -177,7 +177,7 @@
                     if(d.data.result){
                     self.list1=d.data.result.splice(0,12);
                     self.$parent.globalData.openId=d.data.openId;
-                    console.log(d.data.openId,'wepy 通过login code获取到的openid')
+                    // console.log(d.data.openId,'wepy 通过login code获取到的openid')
                     //统计星星数目
                     for(var i in self.list1){self.count+=self.list1[i].start;}
                       self.$parent.globalData.sum=self.count;

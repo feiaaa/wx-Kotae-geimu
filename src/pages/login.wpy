@@ -43,7 +43,7 @@
 <script>
   import wepy from 'wepy'
 
-  export default class Me extends wepy.page {
+  export default class Login extends wepy.page {
     config = {
       navigationBarTitleText: '授权页'
     }
@@ -62,15 +62,11 @@
         var self=this;
         if (e.detail.userInfo){
           //用户按了允许授权按钮
-          self.$parent.globalData.authUser=true;
           self.$parent.globalData.userInfo=e.detail.userInfo;
           self.$apply();
           wx.switchTab({
             url: 'index'
           })
-        } else {
-          //用户按了拒绝按钮
-          self.$parent.globalData.authUser=false;
         }
       },
 
@@ -80,28 +76,6 @@
     onLoad() {
       var self=this;
       console.log('in onload');
-// 查看是否授权
-      wx.getSetting({
-        success: function(res){
-          if (res.authSetting['scope.userInfo']) {
-            self.$parent.globalData.authUser=true;
-            // 已经授权，可以直接调用 getUserInfo 获取头像昵称
-            wx.getUserInfo({
-              success: function(res) {
-                self.$parent.globalData.userInfo=res.userInfo;
-                self.$apply();
-                wx.switchTab({
-                  url: 'index'
-                })
-              }
-            })
-          }
-          else{
-            self.$parent.globalData.authUser=false;
-          }//else end
-        }
-      })
-
 
     }
 
