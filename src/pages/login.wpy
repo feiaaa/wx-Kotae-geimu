@@ -21,8 +21,17 @@
 
     <view class="page__bd">
       <view>
-        <button wx:if="{{canIUse}}" open-type="getUserInfo" bindgetuserinfo="bindGetUserInfo">授权登录</button>
-        <view wx:else>请升级微信版本</view>
+        <view class="weui-cells__title">为了顺利使用小程序，请先授权登录</view>
+        <view class="weui-cells weui-cells_after-title">
+          <view class="weui-cell">
+            <view class="weui-cell__bd">
+              <button wx:if="{{canIUse}}" open-type="getUserInfo" bindgetuserinfo="bindGetUserInfo">点我授权登录</button>
+              <view wx:else>请升级微信版本</view>
+            </view>
+
+          </view>
+        </view>
+
       </view>
 
 
@@ -51,7 +60,6 @@
     methods = {
       bindGetUserInfo: function(e) {
         var self=this;
-        console.log(e,'=弹出授权登录窗口');
         if (e.detail.userInfo){
           //用户按了允许授权按钮
           self.$parent.globalData.authUser=true;
@@ -93,13 +101,7 @@
           }//else end
         }
       })
-      // setTimeout(function () {
-      //   if(self.$parent.globalData.userInfo){
-      //     wx.switchTab({
-      //       url: 'index'
-      //     })
-      //   }
-      // }, 1000)
+
 
     }
 
