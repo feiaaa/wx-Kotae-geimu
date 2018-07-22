@@ -25,7 +25,7 @@
   <view class="page">
     <view class="userinfo bg_caramel page__hd">
       <image class="userinfo-avatar" src="{{ userInfo.avatarUrl }}" background-size="cover"/>
-      <view class="font-L">“到今天为止，我总共获得了{{count}}个星星。”</view>
+      <view class="font-L">“刚刚我背到了第{{lessonId}}关，获得了{{star}}个星星。”</view>
     </view>
 
     <view class="page__bd ecodeCtr" >
@@ -60,8 +60,8 @@
       userInfo: {
         nickName: '加载中...'
       },
-      count: 100,
-      imgUrl:'',
+      lessonId:0,
+      star:0,
 
     }
 
@@ -76,14 +76,15 @@
     onLoad(options) {
       let self = this;
       self.userInfo = this.$parent.globalData.userInfo;
-      self.count =this.$parent.globalData.sum;//options.count
+      self.star =options.star;
+      self.lessonId=options.lessonId,
       //获取二维码
       wx.request({
         // 获取token
         url: 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential',
         method: 'GET',
         data: {
-           appid: 'appid',
+          appid: 'appid',
           secret: 'secret'
         },
         success(res) {

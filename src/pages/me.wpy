@@ -9,6 +9,7 @@
     width: 80rpx;
     height: 80rpx;
     border-radius: 50%;
+    background:#eeeeee url("../images/me.png") center no-repeat;
   }
 
 </style>
@@ -35,7 +36,7 @@
         </view>
         <view class="weui-cell">
           <view class="weui-cell__bd">版本号</view>
-          <view class="weui-cell__ft">v1.0.0</view>
+          <view class="weui-cell__ft">v1.0.2</view>
         </view>
 
 

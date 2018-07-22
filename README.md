@@ -27,7 +27,8 @@ npm install wepy-cli -g
 npm install 
 wepy build --watch
 ```
-需要自己提供一个已经备案过的网站并且改相关接口。
+需要自己提供一个已经备案过的https的网站并且改相关接口。
+分享功能需要自己准备appid和secret （直接去小程序后台获取即可）
 
 
 ### 最小知识地图
@@ -36,4 +37,4 @@ wepy build --watch
 - vue文档
 
 ### 最新进度
-2018-7-19 登陆bug修复中
+2018-7-22 正式版审核中

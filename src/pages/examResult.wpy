@@ -198,10 +198,26 @@
         var res = wx.getStorageSync('examResult')
         if (res) {
           self.star=res.start;
+          self.lessonId=res.lesson;
         }
       } catch (e) {
         //
       }
+    }
+    onShareAppMessage(res) {
+      var self = this;
+      return {
+        title: '我已经背到第'+self.lessonId+'关啦',
+        path: '/pages/shareExam?star=' + self.data.star+'&lessonId='+self.data.lessonId,
+        imageUrl:'/images/sharePic.jpg',
+        success: function (res) {
+          // 转发成功//that.shareClick();
+        },
+        fail: function (res) {
+          // 转发失败
+        }
+      }
+
     }
 
   }

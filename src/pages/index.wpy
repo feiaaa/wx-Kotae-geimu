@@ -211,6 +211,21 @@
 
 
     }
+    onShareAppMessage(res) {
+      var self = this;
+      return {
+        title: '用打怪升级的方式来背单词',
+        path: '/pages/share?count=' + self.data.count+'&imgUrl='+self.data.imgUrl,
+        imageUrl:'/images/sharePic.jpg',
+        success: function (res) {
+          // 转发成功//that.shareClick();
+        },
+        fail: function (res) {
+          // 转发失败
+        }
+      }
+
+    }
 
     //
   }
