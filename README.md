@@ -1,15 +1,11 @@
 一个背单词的微信小程序 
 ===================
 
-### 欢迎扫码体验
->当前二维码为体验版（只有12个单词和1关的题目，等把题库词库上完发正式版）
->
->![小程序](https://github.com/feiaaa/wx-Kotae-geimu/blob/master/src/images/ecode.png)
->如果码扫出来无效的话，在文件夹里有MP4文件，可以查看演示情况
 
 ### 效果
 
-![效果图](https://github.com/feiaaa/wx-Kotae-geimu/blob/master/src/images/pic.png)
+![效果图](https://github.com/feiaaa/wx-Kotae-geimu/blob/master/readmeImg/pic.png)
+>文件夹里有MP4文件，可以查看演示情况
 
 ### 使用工具
 - 微信小程序默认的开发工具
@@ -37,4 +33,10 @@ wepy build --watch
 - vue文档
 
 ### 最新进度
-2018-7-22 正式版审核中
+2018-7-22 正式版通过，获取openid有问题修复中
+
+### 欢迎扫码体验
+>当前二维码为正式版
+>
+>![小程序](https://github.com/feiaaa/wx-Kotae-geimu/blob/master/readmeImg/ecode.jpg)
+
