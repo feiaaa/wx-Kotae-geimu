@@ -12,17 +12,17 @@
     display: block;
     text-align: center;
     margin: 0 auto;
-  .lessonId{
-    height: 66%;
-    line-height: 50px;
-    display: block;
-    width: 100%;
-  }
-  .lessonStar{
-    height: 33%;
-    width: 100%;display: block;
-    border-top:1px solid #dfdfdf;
-  }
+    .lessonId{
+      height: 66%;
+      line-height: 50px;
+      display: block;
+      width: 100%;
+    }
+    .lessonStar{
+      height: 33%;
+      width: 100%;display: block;
+      border-top:1px solid #dfdfdf;
+    }
   }
 </style>
 <template>
@@ -31,7 +31,7 @@
       选择关卡
     </view>
     <view class="page__bd">
-      <view class="weui-grids">
+      <view class="weui-grids overflow">
         <block wx:for="{{list1}}" wx:key="item.lesson">
           <view class="weui-grid" hover-class="weui-grid_active" @tap="toast({{item.islock}},{{item.lesson}})">
             <div class="lessonBox">
@@ -48,6 +48,12 @@
             <!--<view class="weui-grid__label">第{{item.lesson}}关</view>-->
           </view>
         </block>
+      </view>
+      <view class="weui-cells"  wx:if="{{openId==''}}">
+        <view class="weui-cell">
+          <view class="weui-cell__bd">请求失败，请去授权</view>
+          <view class="weui-cell__ft"><button class="weui-btn mini-btn" type="primary" size="mini" @tap="jumpToLogin()">点我授权</button></view>
+        </view>
       </view>
 
     </view>
@@ -87,6 +93,7 @@
       },
 
       openId:'',
+      rescode:'',
       count: 0,//星星总数
       netrst: '',
       list1: [],
@@ -117,12 +124,12 @@
           })
         }
         else if(lock==0 && lock<this.currentRange){
-        let promise = this.$invoke('toast', 'show', {
-          title: '请先解除前面关卡',
-        })
-        promise.then((d) => {
-          console.log('toast done')
-        })
+          let promise = this.$invoke('toast', 'show', {
+            title: '请先解除前面关卡',
+          })
+          promise.then((d) => {
+            console.log('toast done')
+          })
         }
 
         else{
@@ -133,12 +140,18 @@
 
 
       },
+      jumpToLogin(){
+        wx.navigateTo({
+          url:'login'
+        });
+      },
       tap () {
         console.log('do noting from ' + this.$name)
       },
       request(self){
-        //console.log(self.$parent.globalData.openId,'存在globaldata里的openid')
-        wepy.request({
+        console.log('in request self');
+        self.openId=self.$parent.globalData.openId;
+        wx.request({
           url:  self.$parent.globalData.devUrl+'/Users?openId='+self.$parent.globalData.openId+'&isHuiHui=1',
           method:'GET',
           success: function (d) {
@@ -165,24 +178,40 @@
       let self = this;
       this.$parent.getUserInfo(function (userInfo) {
         if (userInfo) {
+          let promise = self.$invoke('toast', 'show', {
+            title: '获取中……',
+          })
           self.userInfo = userInfo;
           self.$apply();
+          console.log(self.userInfo,'=userInfo');
           wx.login({
             success: function(res) {
-              if (res.code) {
-                wepy.request({
-                  url:  self.$parent.globalData.devUrl+'/Users?openId='+res.code+'&nickName='+self.userInfo.nickName+'&iconUrl='+self.userInfo.avatarUrl+'&isHuiHui=1',
+              var code=res.code;
+              if (code) {
+                  self.rescode=code;
+                  self.$apply();
+                wx.request({
+                  url:  self.$parent.globalData.devUrl+'/Users?openId='+code+'&nickName='+self.userInfo.nickName+'&iconUrl='+self.userInfo.avatarUrl+'&isHuiHui=1',
                   method:'POST',
                   success: function (d) {
                     if(d.data.result){
-                    self.list1=d.data.result.splice(0,12);
-                    self.$parent.globalData.openId=d.data.openId;
-                    // console.log(d.data.openId,'wepy 通过login code获取到的openid')
-                    //统计星星数目
-                    for(var i in self.list1){self.count+=self.list1[i].start;}
+                      self.list1=d.data.result.splice(0,12);
+                      self.$parent.globalData.openId=d.data.openId;
+                      self.openId=self.$parent.globalData.openId;
+                      //统计星星数目
+                      for(var i in self.list1){self.count+=self.list1[i].start;}
                       self.$parent.globalData.sum=self.count;
                     }
                     self.$apply()
+                  },
+                  fail:function(res){
+                    console.log('res failure',res);
+                    let promise = self.$invoke('toast', 'show', {
+                      title: '请求失败'+res.errMsg,
+                    })
+                  },
+                  complete:function(res){
+                    console.log('res complete',res);
                   }
                 })
                 //request end
@@ -190,9 +219,15 @@
               } else {
                 console.log('登录失败！' + res.errMsg)
               }
-            }
+            },
+
           });
           //login end
+        }//if userinfo
+        else{
+          let promise = self.$invoke('toast', 'show', {
+            title: '未获取到用户信息，请重试',
+          })
         }
 
       })

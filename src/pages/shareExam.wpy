@@ -84,8 +84,8 @@
         url: 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential',
         method: 'GET',
         data: {
-          appid: 'appid',
-          secret: 'secret'
+          appid:self.$parent.globalData.appid,
+          secret: self.$parent.globalData.secret
         },
         success(res) {
           // console.log(res,'res accseetoken');

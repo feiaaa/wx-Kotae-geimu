@@ -1,7 +1,12 @@
 <style lang="less">
   @import 'weui.wxss';
   @import 'Iconfont/iconfont.wxss';
+  .overflow{overflow:hidden}
   .maxW50{max-width: 50%;min-width: 30%;}
+  .pd40{
+    padding: 40px;
+  }
+  .font-L{font-size: ~'50rpx'}
   .clrCaramel{color:#dd6741}
   .bg_primary{background: #2298be;color:white}
   .bg_caramel{background: #dd6741;color:white}
@@ -56,6 +61,7 @@ setStore(store)
 export default class extends wepy.app {
   config = {
     "pages": [
+      "pages/login",
       "pages/index",
       "pages/me",
       "pages/wordsList",
@@ -63,6 +69,8 @@ export default class extends wepy.app {
       "pages/exam",
       "pages/examResult",
       "pages/errorWordsList",
+      "pages/share",
+      "pages/shareExam",
     ],
     "tabBar": {
       "list": [{
@@ -88,54 +96,67 @@ export default class extends wepy.app {
       "navigationBarTextStyle": "white"
     },
     "networkTimeout": {
-      "request": 10000,
-      "downloadFile": 10000
+      "request": 150000,
+      "downloadFile": 150000
     },
   }
 
   globalData = {
     userInfo: null,
-    devUrl:'https://yourwebsite.site/apiname',
+    devUrl:'https://123.site/123',
+    appid: '123',
+    secret: '123',
     openId:'',
     reLoadIndex:false,
+    sum:0,
   }
 
   constructor () {
     super()
-    this.use('requestfix')
+    this.use('requestfix');
+    this.use('promisify');
   }
 
   onLaunch() {
-    //this.testAsync()
-    var that=this;
-    // 上传前把login改到这里来
-  }
-
-  sleep (s) {
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        resolve('promise resolved')
-      }, s * 1000)
-    })
-  }
-
-  async testAsync () {
-    // const data = await this.sleep(3)
-    // console.log(data)
-  }
-
-  getUserInfo(cb) {
-    const that = this
-    if (this.globalData.userInfo) {
-      return this.globalData.userInfo
-    }
-    wepy.getUserInfo({
-      success (res) {
-        that.globalData.userInfo = res.userInfo;
-        //cb && cb(that.globalData.userInfo)
-        cb && cb(res.userInfo)
+    var self=this;
+    // 查看是否授权
+    wx.getSetting({
+      success: function(res){
+        if (res.authSetting['scope.userInfo']) {
+          // 已经授权，可以直接调用 getUserInfo 获取头像昵称
+          wx.getUserInfo({
+            success: function(res) {
+              self.globalData.userInfo=res.userInfo;
+              wx.switchTab({
+                url: 'index'
+              })
+            }
+          })
+        }
       }
     })
+
+  }
+
+
+  getUserInfo(cb) {
+    const that = this;
+
+
+    if (this.globalData.userInfo) {
+      cb && cb(this.globalData.userInfo);
+      return this.globalData.userInfo
+    }
+    else{
+      console.log('请去授权');
+    }
+    // wepy.getUserInfo({
+    //   success (res) {
+    //     that.globalData.userInfo = res.userInfo;
+    //     //cb && cb(that.globalData.userInfo)
+    //     cb && cb(res.userInfo)
+    //   }
+    // })
   }
   //公用方法查询单词详情
 }

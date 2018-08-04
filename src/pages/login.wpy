@@ -9,6 +9,7 @@
     width: 80rpx;
     height: 80rpx;
     border-radius: 50%;
+    background:#eeeeee;
   }
 
 </style>
@@ -83,6 +84,7 @@
             wx.getUserInfo({
               success: function(res) {
                 self.$parent.globalData.userInfo=res.userInfo;
+                self.$apply();
                 wx.switchTab({
                   url: 'index'
                 })
