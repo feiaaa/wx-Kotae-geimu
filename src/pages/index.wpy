@@ -93,7 +93,6 @@
       },
 
       openId:'',
-      rescode:'',
       count: 0,//星星总数
       netrst: '',
       list1: [],
@@ -154,6 +153,9 @@
         wx.request({
           url:  self.$parent.globalData.devUrl+'/Users?openId='+self.$parent.globalData.openId+'&isHuiHui=1',
           method:'GET',
+          header:{
+            "Content-Type":"application/x-www-form-urlencoded",
+          },
           success: function (d) {
             if(d.data.result){
               self.list1=d.data.result.splice(0,12);
@@ -186,13 +188,13 @@
           console.log(self.userInfo,'=userInfo');
           wx.login({
             success: function(res) {
-              var code=res.code;
-              if (code) {
-                  self.rescode=code;
-                  self.$apply();
+
                 wx.request({
-                  url:  self.$parent.globalData.devUrl+'/Users?openId='+code+'&nickName='+self.userInfo.nickName+'&iconUrl='+self.userInfo.avatarUrl+'&isHuiHui=1',
+                  url:  self.$parent.globalData.devUrl+'/Users?openId='+res.code+'&nickName='+self.userInfo.nickName+'&iconUrl='+self.userInfo.avatarUrl+'&isHuiHui=1',
                   method:'POST',
+                  header:{
+                    "Content-Type":"application/x-www-form-urlencoded",
+                  },
                   success: function (d) {
                     if(d.data.result){
                       self.list1=d.data.result.splice(0,12);
@@ -216,9 +218,7 @@
                 })
                 //request end
 
-              } else {
-                console.log('登录失败！' + res.errMsg)
-              }
+
             },
 
           });

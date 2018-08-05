@@ -109,7 +109,7 @@
 
     onShow() {
       let self = this;
-      wepy.request({
+      wx.request({
         url: self.$parent.globalData.devUrl + '/words',
         method: 'POST',
         data: {

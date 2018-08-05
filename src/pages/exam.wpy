@@ -204,9 +204,12 @@
           }
         } catch (e) {
           console.log("单词详情失败信息，改用调取id");
-          wepy.request({
+          wx.request({
             url:  self.$parent.globalData.devUrl+'/lesson?wordId='+wordId,
             method:'POST',
+            header:{
+              "Content-Type":"application/x-www-form-urlencoded",
+            },
             success: function (d) {
 
               if(d.statusCode==200){
@@ -291,7 +294,7 @@
       self.lessonId=options.id;
 
       //获取试题信息
-      wepy.request({
+      wx.request({
         url: self.$parent.globalData.devUrl+'/questions?lesson='+self.lessonId,
         method:'GET',
         success: function (d) {

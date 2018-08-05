@@ -116,9 +116,12 @@
          */
         fail: function(res) {
           console.log(res,"单词详情失败信息，改用调取id");
-          wepy.request({
+          wx.request({
             url:  self.$parent.globalData.devUrl+'/lesson?wordId='+self.wordId+'&openId='+self.$parent.globalData.openId,
             method:'POST',
+            header:{
+              "Content-Type":"application/x-www-form-urlencoded",
+            },
             success: function (d) {
               console.log(d,'in fail');
               if(d.statusCode==200){
