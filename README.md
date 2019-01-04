@@ -26,11 +26,20 @@ wepy build --watch
 需要自己提供一个已经备案过的https的网站并且改相关接口。
 分享功能需要自己准备appid和secret （直接去小程序后台获取即可）
 
-
+### npm安装包升级更新
+```
+　// npm-check检查更新
+　　　　　　npm install -g npm-check
+　　　　　　npm-check
+　// npm-upgrade更新
+　　　　　　npm install -g npm-upgrade
+　　　　　　npm-upgrade
+```
 ### 最小知识地图
 - 微信小程序官方文档
 - WePY官方文档
 - vue文档
+
 
 ### 最新进度
 2018-7-22 正式版通过，获取openid有问题修复中
