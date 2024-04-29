@@ -1,5 +1,7 @@
-node_modules
-dist
-.DB_store
-.idea
-package-lock.json
+dist/
+deploy_versions/
+.temp/
+.rn_temp/
+node_modules/
+.DS_Store
+.swc

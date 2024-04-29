@@ -1,15 +1,32 @@
 {
-	"description": "a wepy proj",
-	"setting": {
-		"urlCheck": true,
-		"es6": false,
-		"postcss": false,
-		"minified": false,
-		"newFeature": true
-	},
-	"compileType": "miniprogram",
-	"appid": "wxef37c54592ab9b16",
-	"projectname": "niwa",
-	"miniprogramRoot": "./dist",
-	"condition": {}
+  "miniprogramRoot": "dist/",
+  "projectname": "myApp",
+  "description": "itto",
+  "appid": "wxef37c54592ab9b16",
+  "setting": {
+    "urlCheck": true,
+    "es6": false,
+    "enhance": false,
+    "compileHotReLoad": false,
+    "postcss": false,
+    "minified": false,
+    "babelSetting": {
+      "ignore": [],
+      "disablePlugins": [],
+      "outputPath": ""
+    }
+  },
+  "compileType": "miniprogram",
+  "libVersion": "3.4.3",
+  "srcMiniprogramRoot": "dist/",
+  "packOptions": {
+    "ignore": [],
+    "include": []
+  },
+  "condition": {},
+  "editorSetting": {
+    "tabIndent": "insertSpaces",
+    "tabSize": 2
+  },
+  "simulatorPluginLibVersion": {}
 }
