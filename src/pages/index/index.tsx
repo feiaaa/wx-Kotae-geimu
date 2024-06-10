@@ -1,42 +1,43 @@
-import { View, Switch,Text } from '@tarojs/components'
+import { View, Switch,Text,Button } from '@tarojs/components'
 import { useLoad } from '@tarojs/taro'
 import './index.less'
-import listData from './list.json';
-import CustomTable from "../../components/CustomTable/index";
+import listData from '../../utils/list.json';
+import DragSubItem from "../../components/DragSubItem/index";
 import { useState } from 'react';
 
 interface StateProps {
-  tableFlag:Boolean
+  Item:{
+    name:string,
+    id:string,
+  },
 }
 export default function Index<StateProps>() {
 
-  // const [tableFlag,setTableFlag]=useState<Boolean>(false)
+  const [item,setItem]=useState<any>(undefined);
 
   useLoad(() => {
     console.log('Page loaded.')
   })
 
-  // console.log(tableFlag,"==tableFlag",listData)
+  const jumpToSubItem=(item)=>{
+    setItem(item);
+    console.log(item,"=item")
+  }
+  
   return (
     <View className='index'>
-      {/* <p>表格展示<Switch checked={tableFlag} 
-      onChange={e=>setTableFlag(e)}
-      />
-      <Text>列表展示</Text></p> */}
+    {
+      listData.map(item=>(
+          <Button
+          onClick={()=>{jumpToSubItem(item)}}
+          > {item.id}.{item.area} </Button>))
       
-      {/* {tableFlag?
-
-      // <CustomTable/>
-      <Text>111</Text>: */}
-      <View>
-        {listData.map(item=>(<View >
-          <Text> {item.id}-{item.name} </Text>
-          <Text> {item.process}-{item.area} </Text>
+    }
+    {item &&<DragSubItem
       
-          </View>))}
-      </View>
-      
-      {/* } */}
+      item={item}
+    />}
+    
     </View>
   )
 }
